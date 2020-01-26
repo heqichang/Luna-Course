@@ -1,6 +1,8 @@
 
 import 'package:flutter/material.dart';
 import 'package:luna_flutter/add.dart';
+import 'package:luna_flutter/model/course.dart';
+import 'package:luna_flutter/util/database.dart';
 
 class HomePage extends StatefulWidget {
 
@@ -13,7 +15,15 @@ class HomePage extends StatefulWidget {
 
 class HomePageState extends State<HomePage> {
 
-  var _courses = [];
+  List<Course> _courses = [];
+
+  @override
+  void initState() {
+    super.initState();
+    // 官方推荐在这里获取数据，生命周期只运行一次
+    _loadData();
+  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -26,7 +36,7 @@ class HomePageState extends State<HomePage> {
       body: ListView.builder(
         itemBuilder: (BuildContext context, int index) {
           return ListTile(
-            title: Text(_courses[index] + ' $index'),
+            title: Text(_courses[index].name),
             onLongPress: () {
               _showDeleteCourseAlert(context, index);
             },
@@ -55,7 +65,11 @@ class HomePageState extends State<HomePage> {
     ));
 
     if (result != null) {
-      _courses.add(result);
+      final c = Course(name: result, sortOrder: 1, createTime: DateTime.now().millisecondsSinceEpoch);
+      var db = DatabaseUtil();
+      db.insert(c);
+      //TODO: 这里可以不用 setState 也可以更改 UI （疑问：可能页面回退，会自动调用更改状态！？）
+      _courses.add(c);
     }
 
   }
@@ -88,6 +102,22 @@ class HomePageState extends State<HomePage> {
         );
       }
     );
+  }
+
+  void _loadData() async {
+
+    final db = DatabaseUtil();
+    final resultList = await db.getAll('courses');
+    for(var item in resultList) {
+      final course = Course.fromMap(item);
+      _courses.add(course);
+    }
+
+    // 可以不用在 callback 里更改数据，只需调用就可以更改 UI 了
+    setState(() {
+
+    });
+
   }
 
 }
