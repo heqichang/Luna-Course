@@ -52,9 +52,45 @@ class DatabaseUtil {
     return db.insert(model.tableName, model.toMap());
   }
 
+  Future<int> update<T extends BaseModel>(T model) async {
+    final db = await _db;
+    return db.update(model.tableName, model.toMap(), where: 'id = ?', whereArgs: [model.id]);
+  }
+
+  Future<int> delete<T extends BaseModel>(T model) async {
+    final db = await _db;
+    return db.delete(model.tableName, where: 'id = ?', whereArgs: [model.id]);
+  }
+
   Future<List<Map<String, dynamic>>> getAll(String tableName) async {
+    // 不能用 new T() ，不然可以直接返回 model
     final db = await _db;
     return db.query(tableName);
+  }
+  
+  Future<List<Map<String, dynamic>>> get(String tableName,
+      {bool distinct,
+        List<String> columns,
+        String where,
+        List<dynamic> whereArgs,
+        String groupBy,
+        String having,
+        String orderBy,
+        int limit,
+        int offset}) async {
+    final db = await _db;
+    return db.query(
+      tableName,
+      distinct: distinct,
+      columns: columns,
+      where: where,
+      whereArgs: whereArgs,
+      groupBy: groupBy,
+      having: having,
+      orderBy: orderBy,
+      limit: limit,
+      offset: offset
+    );
   }
 
 }

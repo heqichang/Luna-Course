@@ -2,6 +2,7 @@
 import 'package:flutter/material.dart';
 import 'package:luna_flutter/add.dart';
 import 'package:luna_flutter/model/course.dart';
+import 'package:luna_flutter/record.dart';
 import 'package:luna_flutter/util/database.dart';
 
 class HomePage extends StatefulWidget {
@@ -33,15 +34,19 @@ class HomePageState extends State<HomePage> {
         title: const Text('课程记录'),
       ),
 
-      body: ListView.builder(
+      body: ListView.separated(
         itemBuilder: (BuildContext context, int index) {
           return ListTile(
             title: Text(_courses[index].name),
             onLongPress: () {
               _showDeleteCourseAlert(context, index);
             },
+            onTap: () {
+              _showRecord(context, index);
+            },
           );
         },
+        separatorBuilder: (BuildContext context, int index) => Divider(),
         itemCount: _courses.length,
       ),
 
@@ -102,6 +107,15 @@ class HomePageState extends State<HomePage> {
         );
       }
     );
+  }
+
+  void _showRecord(BuildContext context, int index) {
+
+    final course = _courses[index];
+
+    Navigator.push(context, MaterialPageRoute(
+      builder: (context) => RecordPage(courseId: course.id,),
+    ));
   }
 
   void _loadData() async {

@@ -7,7 +7,9 @@ class Course extends BaseModel {
   @override
   String tableName = 'courses';
 
+  @override
   int id;
+
   String name;
   int sortOrder;
   int createTime;

@@ -6,7 +6,9 @@ class CourseRecord extends BaseModel {
   @override
   String tableName = 'course_records';
 
+  @override
   int id;
+
   int courseId;
   int recordTime;
   String remark;
@@ -34,7 +36,7 @@ class CourseRecord extends BaseModel {
 
   @override
   Map<String, dynamic> toMap() {
-    Map map = {
+    Map<String, dynamic> map = {
       'course_id': courseId,
       'record_time': recordTime,
       'remark': remark,

@@ -3,6 +3,7 @@
 abstract class BaseModel {
 
   String tableName;
+  int id; // 主键
 
   BaseModel();
 
