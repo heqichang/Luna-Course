@@ -4,6 +4,7 @@ import 'package:luna_flutter/add.dart';
 import 'package:luna_flutter/model/course.dart';
 import 'package:luna_flutter/record.dart';
 import 'package:luna_flutter/util/database.dart';
+import 'package:luna_flutter/widget/course_card.dart';
 
 class HomePage extends StatefulWidget {
 
@@ -34,19 +35,19 @@ class HomePageState extends State<HomePage> {
         title: const Text('课程记录'),
       ),
 
-      body: ListView.separated(
+      body: ListView.builder(
         itemBuilder: (BuildContext context, int index) {
-          return ListTile(
-            title: Text(_courses[index].name),
-            onLongPress: () {
-              _showDeleteCourseAlert(context, index);
-            },
+          return CourseCard(
+            course: _courses[index],
             onTap: () {
               _showRecord(context, index);
             },
+            onLongPress: () {
+              _showDeleteCourseAlert(context, index);
+            },
           );
         },
-        separatorBuilder: (BuildContext context, int index) => Divider(),
+
         itemCount: _courses.length,
       ),
 
@@ -61,22 +62,17 @@ class HomePageState extends State<HomePage> {
   }
 
   void _addCourse(BuildContext context) async {
-    // 通过更改状态来更新 UI
-//    setState(() {
-//      _courses.add('test');
-//    });
+
     final result = await Navigator.push(context, MaterialPageRoute(
       builder: (context) => AddPage(),
     ));
 
     if (result != null) {
-      final c = Course(name: result, sortOrder: 1, createTime: DateTime.now().millisecondsSinceEpoch);
-      var db = DatabaseUtil();
-      db.insert(c);
-      //TODO: 这里可以不用 setState 也可以更改 UI （疑问：可能页面回退，会自动调用更改状态！？）
-      _courses.add(c);
+      if (result is Course) {
+        //TODO: 这里可以不用 setState 也可以更改 UI （疑问：可能页面回退，会自动调用更改状态！？)
+        _courses.add(result);
+      }
     }
-
   }
 
   void _showDeleteCourseAlert(BuildContext context, int index) {

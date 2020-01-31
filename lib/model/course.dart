@@ -11,15 +11,19 @@ class Course extends BaseModel {
   int id;
 
   String name;
+  int attended;
+  int total;
   int sortOrder;
   int createTime;
 
-  Course({this.id, this.name, this.sortOrder, this.createTime});
+  Course({this.id, this.name, this.attended, this.total, this.sortOrder, this.createTime});
 
   // 命名构造函数，dart 没有构造函数重载，用的这种方式
   Course.fromMap(Map<String, dynamic> map) {
     id = map['id'];
     name = map['name'];
+    attended = map['attended'];
+    total = map['total'];
     sortOrder = map['sort_order'];
     createTime = map['create_time'];
   }

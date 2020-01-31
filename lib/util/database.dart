@@ -27,6 +27,8 @@ class DatabaseUtil {
           CREATE TABLE courses(
             id INTEGER PRIMARY KEY, 
             name TEXT, 
+            attended INTEGER,
+            total INTEGER, 
             sort_order INTEGER, 
             create_time INTEGER
           )
