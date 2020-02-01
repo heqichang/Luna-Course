@@ -32,6 +32,8 @@ class Course extends BaseModel {
   void fromMap(Map<String, dynamic> map) {
     id = map['id'];
     name = map['name'];
+    attended = map['attended'];
+    total = map['total'];
     sortOrder = map['sort_order'];
     createTime = map['create_time'];
   }
@@ -41,6 +43,8 @@ class Course extends BaseModel {
 
     Map<String, dynamic> map = <String, dynamic>{
       'name': name,
+      'attended': attended,
+      'total': total,
       'sort_order': sortOrder,
       'create_time': createTime,
     };

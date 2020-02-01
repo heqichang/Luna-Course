@@ -6,6 +6,10 @@ import 'package:luna_flutter/util/util.dart';
 
 class AddPage extends StatefulWidget {
 
+  final Course course;
+
+  AddPage({Key key, this.course}) : super(key: key);
+
   @override
   State<StatefulWidget> createState() {
     return AddPageState();
@@ -18,6 +22,18 @@ class AddPageState extends State<AddPage> {
 
   final _textController = TextEditingController();
   final _totalTextController = TextEditingController();
+
+  @override
+  void initState() {
+
+    super.initState();
+    if (widget.course != null) {
+      _textController.text = widget.course.name;
+      final totalText = widget.course.total.toString();
+
+      _totalTextController.text = widget.course.total == 0 ? '' : totalText;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -66,8 +82,11 @@ class AddPageState extends State<AddPage> {
               RaisedButton(
                 child: Text('确认'),
                 onPressed: () {
-                  _addCourse(context);
-
+                  if (widget.course != null) {
+                    _updateCourse(context);
+                  } else {
+                    _addCourse(context);
+                  }
                 },
               ),
 
@@ -105,5 +124,26 @@ class AddPageState extends State<AddPage> {
     Navigator.pop(context, course);
   }
 
+  void _updateCourse(BuildContext context) async {
+
+    final name = _textController.text;
+
+    if (name.trim() == '') {
+      await showAlert(context, '没有填写课程名称');
+      return;
+    }
+
+    final totalText = _totalTextController.text.trim();
+    final total = int.tryParse(totalText) ?? 0;
+
+    final db = DatabaseUtil();
+    final course = widget.course;
+    course.name = name;
+    course.total = total;
+
+    db.update(course);
+
+    Navigator.pop(context, course);
+  }
 
 }

@@ -38,6 +38,7 @@ class DatabaseUtil {
             id INTEGER PRIMARY KEY,
             course_id INTEGER,
             record_time INTEGER,
+            status INTEGER, 
             remark TEXT,
             create_time INTEGER
           )
@@ -64,10 +65,37 @@ class DatabaseUtil {
     return db.delete(model.tableName, where: 'id = ?', whereArgs: [model.id]);
   }
 
+  Future<int> deleteByName(String tableName, {String where, List<dynamic> whereArgs}) async {
+    final db = await _db;
+    return db.delete(
+      tableName,
+      where: where,
+      whereArgs: whereArgs,
+    );
+  }
+
   Future<List<Map<String, dynamic>>> getAll(String tableName) async {
     // 不能用 new T() ，不然可以直接返回 model
     final db = await _db;
     return db.query(tableName);
+  }
+
+  Future<int> getCount(String tableName, {String where, List<dynamic> whereArgs}) async {
+
+    final db = await _db;
+
+    var rawSql = 'select count(*) from $tableName';
+    if (where != null) {
+      rawSql += ' where $where';
+    }
+
+
+    final count = Sqflite.firstIntValue(await db.rawQuery(
+      rawSql,
+      whereArgs,
+    ));
+
+    return count;
   }
   
   Future<List<Map<String, dynamic>>> get(String tableName,
@@ -81,6 +109,7 @@ class DatabaseUtil {
         int limit,
         int offset}) async {
     final db = await _db;
+
     return db.query(
       tableName,
       distinct: distinct,

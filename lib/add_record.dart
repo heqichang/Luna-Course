@@ -166,6 +166,7 @@ class AddRecordPageState extends State<AddRecordPage> {
         var record = CourseRecord(
           courseId: widget.courseId,
           recordTime: _recordTime,
+          status: 1, //TODO: 测试
           remark: _textController.text,
           createTime: DateTime.now().millisecondsSinceEpoch,
         );
@@ -173,6 +174,7 @@ class AddRecordPageState extends State<AddRecordPage> {
         final db = DatabaseUtil();
         final recordId = await db.insert(record);
         record.id = recordId;
+
 
         Navigator.pop(context, {'status': 'add', 'data': record});
       }

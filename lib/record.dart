@@ -21,6 +21,7 @@ class RecordPage extends StatefulWidget {
 class RecordPageState extends State<RecordPage> {
 
   List<CourseRecord> _records = [];
+  bool _courseUpdate = false; // 是否需要刷新首页上课课时
 
   @override
   void initState() {
@@ -32,38 +33,77 @@ class RecordPageState extends State<RecordPage> {
   @override
   Widget build(BuildContext context) {
 
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('详细记录'),
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          _addRecord(context);
-        },
-        tooltip: '添加记录',
-        child: const Icon(Icons.add),
-      ),
-      body: ListView.separated(
-        itemCount: _records.length,
-        separatorBuilder: (BuildContext context, int index) => Divider(),
-        itemBuilder: (BuildContext context, int index) {
+    return WillPopScope(
+      onWillPop: () async {
+        Navigator.of(context).pop(_courseUpdate);
+        return false;
+      },
+      child: Scaffold(
+        appBar: AppBar(
+          title: const Text('详细记录'),
+        ),
+        floatingActionButton: FloatingActionButton(
+          onPressed: () {
+            _addRecord(context);
+          },
+          tooltip: '添加记录',
+          child: const Icon(Icons.add),
+        ),
+        body: ListView.separated(
+          itemCount: _records.length,
+          separatorBuilder: (BuildContext context, int index) => Divider(),
+          itemBuilder: (BuildContext context, int index) {
 
-          return Dismissible(
-            child: ListTile(
-              title: _recordText(index),
-              onTap: () {
-                _updateRecord(index);
+            return Dismissible(
+              child: ListTile(
+                title: _recordText(index),
+                onTap: () {
+                  _updateRecord(index);
+                },
+              ),
+              onDismissed: (_) {
+                _delete(index);
               },
-            ),
-            onDismissed: (_) {
-              _delete(index);
-            },
-            key: Key(_records[index].id.toString()),
-          );
+              key: Key(_records[index].id.toString()),
+            );
 
-        },
+          },
+        ),
       ),
     );
+
+//    return Scaffold(
+//      appBar: AppBar(
+//        title: const Text('详细记录'),
+//      ),
+//      floatingActionButton: FloatingActionButton(
+//        onPressed: () {
+//          _addRecord(context);
+//        },
+//        tooltip: '添加记录',
+//        child: const Icon(Icons.add),
+//      ),
+//      body: ListView.separated(
+//        itemCount: _records.length,
+//        separatorBuilder: (BuildContext context, int index) => Divider(),
+//        itemBuilder: (BuildContext context, int index) {
+//
+//          return Dismissible(
+//            child: ListTile(
+//              title: _recordText(index),
+//              onTap: () {
+//                _updateRecord(index);
+//              },
+//            ),
+//            onDismissed: (_) {
+//              _delete(index);
+//            },
+//            key: Key(_records[index].id.toString()),
+//          );
+//
+//        },
+//      ),
+//    );
   }
 
   void _addRecord(BuildContext context) async {
@@ -95,6 +135,7 @@ class RecordPageState extends State<RecordPage> {
           }
         }
 
+        _courseUpdate = true;
       }
 
     }
@@ -123,8 +164,10 @@ class RecordPageState extends State<RecordPage> {
   void _delete(int index) async {
     final db = DatabaseUtil();
     var record = _records[index];
-    await db.delete(record);
+    db.delete(record);
     _records.removeAt(index);
+    _courseUpdate = true;
+
     setState(() {
 
     });

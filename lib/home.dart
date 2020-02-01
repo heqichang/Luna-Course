@@ -43,6 +43,12 @@ class HomePageState extends State<HomePage> {
               _showRecord(context, index);
             },
             onLongPress: () {
+//              _showDeleteCourseAlert(context, index);
+            },
+            editAction: () {
+              _editCourse(context, index);
+            },
+            deleteAction: () {
               _showDeleteCourseAlert(context, index);
             },
           );
@@ -93,9 +99,7 @@ class HomePageState extends State<HomePage> {
               child: Text('确认'),
               onPressed: () {
                 Navigator.pop(context);
-                setState(() {
-                  _courses.removeAt(index);
-                });
+                _deleteCourse(index);
               },
             ),
           ],
@@ -105,13 +109,26 @@ class HomePageState extends State<HomePage> {
     );
   }
 
-  void _showRecord(BuildContext context, int index) {
+  void _showRecord(BuildContext context, int index) async {
 
+    final db = DatabaseUtil();
     final course = _courses[index];
 
-    Navigator.push(context, MaterialPageRoute(
+    final update = await Navigator.push(context, MaterialPageRoute(
       builder: (context) => RecordPage(courseId: course.id,),
     ));
+
+    print('-----');
+    print(update);
+    if (update == true) {
+      // 最新获取已上课课时
+      final attendedCount = await db.getCount('course_records', where: 'course_id = ? and status = ?', whereArgs: [course.id, 1]);
+      print(attendedCount);
+      course.attended = attendedCount;
+      db.update(course);
+      _courses[index] = course;
+    }
+
   }
 
   void _loadData() async {
@@ -128,6 +145,34 @@ class HomePageState extends State<HomePage> {
 
     });
 
+  }
+
+  void _deleteCourse(int index) async {
+
+    final db = DatabaseUtil();
+    final course = _courses[index];
+
+    // 异步不用等待
+    db.deleteByName('course_records', where: 'course_id = ?', whereArgs: [course.id]);
+    db.delete(course);
+
+    _courses.removeAt(index);
+    setState(() {
+
+    });
+  }
+
+  void _editCourse(BuildContext context, int index) async {
+
+    final course = _courses[index];
+
+    final result = await Navigator.push(context, MaterialPageRoute(
+      builder: (context) => AddPage(course: course),
+    ));
+
+    if (result != null) {
+      _courses[index] = result;
+    }
   }
 
 }
