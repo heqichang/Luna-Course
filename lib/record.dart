@@ -33,9 +33,11 @@ class RecordPageState extends State<RecordPage> {
   @override
   Widget build(BuildContext context) {
 
+    // willPopScope 可以监听回退事件
     return WillPopScope(
       onWillPop: () async {
         Navigator.of(context).pop(_courseUpdate);
+        // 因为用上面代码去 pop 了，所以这里用 false 返回，不然首页会黑屏
         return false;
       },
       child: Scaffold(
@@ -72,38 +74,6 @@ class RecordPageState extends State<RecordPage> {
       ),
     );
 
-//    return Scaffold(
-//      appBar: AppBar(
-//        title: const Text('详细记录'),
-//      ),
-//      floatingActionButton: FloatingActionButton(
-//        onPressed: () {
-//          _addRecord(context);
-//        },
-//        tooltip: '添加记录',
-//        child: const Icon(Icons.add),
-//      ),
-//      body: ListView.separated(
-//        itemCount: _records.length,
-//        separatorBuilder: (BuildContext context, int index) => Divider(),
-//        itemBuilder: (BuildContext context, int index) {
-//
-//          return Dismissible(
-//            child: ListTile(
-//              title: _recordText(index),
-//              onTap: () {
-//                _updateRecord(index);
-//              },
-//            ),
-//            onDismissed: (_) {
-//              _delete(index);
-//            },
-//            key: Key(_records[index].id.toString()),
-//          );
-//
-//        },
-//      ),
-//    );
   }
 
   void _addRecord(BuildContext context) async {

@@ -122,7 +122,7 @@ class HomePageState extends State<HomePage> {
     print(update);
     if (update == true) {
       // 最新获取已上课课时
-      final attendedCount = await db.getCount('course_records', where: 'course_id = ? and status = ?', whereArgs: [course.id, 1]);
+      final attendedCount = await db.getCount('course_records', where: 'course_id = ? and status in (?, ?)', whereArgs: [course.id, 1, 2]);
       print(attendedCount);
       course.attended = attendedCount;
       db.update(course);

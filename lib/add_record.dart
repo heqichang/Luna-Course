@@ -22,12 +22,20 @@ class AddRecordPage extends StatefulWidget {
 class AddRecordPageState extends State<AddRecordPage> {
 
   int _recordTime;
+  int _recordStatus;
   final _textController = TextEditingController();
 
   @override
   void initState() {
     super.initState();
+
+    // 初始化
+    _recordStatus = 1; // 大部分时间是已上
+    _recordTime = DateTime.now().millisecondsSinceEpoch;
+
     if (widget.record != null) {
+      _recordTime = widget.record.recordTime;
+      _recordStatus = widget.record.status;
       _textController.text = widget.record.remark ?? '';
     }
   }
@@ -42,7 +50,7 @@ class AddRecordPageState extends State<AddRecordPage> {
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: <Widget>[
-          SizedBox(height: 80,),
+          SizedBox(height: 60,),
           GestureDetector(
             onTap: () {
               _showCalendar(context);
@@ -65,6 +73,8 @@ class AddRecordPageState extends State<AddRecordPage> {
               maxLines: 3,
             ),
           ),
+          SizedBox(height: 12),
+          _statusButtons(),
           SizedBox(height: 12),
           ButtonBar(
             children: <Widget>[
@@ -91,19 +101,9 @@ class AddRecordPageState extends State<AddRecordPage> {
 
   Text _timeText() {
 
-    String text = '选择时间';
-    int recordTime = _recordTime;
-
-    if (recordTime == null && widget.record != null) {
-      recordTime = widget.record.recordTime;
-      _recordTime = recordTime;
-    }
-
-    if (recordTime != null) {
-      DateTime time = DateTime.fromMillisecondsSinceEpoch(recordTime);
-      DateFormat format = DateFormat('yyyy-MM-dd');
-      text = format.format(time);
-    }
+    DateTime time = DateTime.fromMillisecondsSinceEpoch(_recordTime);
+    DateFormat format = DateFormat('yyyy-MM-dd');
+    String text = format.format(time);
 
     return Text(
       text,
@@ -114,6 +114,46 @@ class AddRecordPageState extends State<AddRecordPage> {
     );
 
   }
+
+  Widget _statusButtons() {
+
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+      children: <Widget>[
+
+        OutlineButton.icon(
+          onPressed: () {
+            setState(() {
+              _recordStatus = 1;
+            });
+          },
+          icon: _recordStatus == 1 ? Icon(Icons.check_box) : Icon(Icons.check_box_outline_blank),
+          label: Text('已上'),
+        ),
+        OutlineButton.icon(
+          onPressed: () {
+            setState(() {
+              _recordStatus = 2;
+            });
+          },
+          icon: _recordStatus == 2 ? Icon(Icons.check_box) : Icon(Icons.check_box_outline_blank),
+          label: Text('补课'),
+        ),
+        OutlineButton.icon(
+          onPressed: () {
+            setState(() {
+              _recordStatus = 0;
+            });
+          },
+          icon: _recordStatus == 0 ? Icon(Icons.check_box) : Icon(Icons.check_box_outline_blank),
+          label: Text('未上'),
+        ),
+      ],
+
+    );
+
+  }
+
 
   void _showCalendar(BuildContext context) async {
     final DateTime picked = await showDatePicker(
@@ -166,7 +206,7 @@ class AddRecordPageState extends State<AddRecordPage> {
         var record = CourseRecord(
           courseId: widget.courseId,
           recordTime: _recordTime,
-          status: 1, //TODO: 测试
+          status: _recordStatus,
           remark: _textController.text,
           createTime: DateTime.now().millisecondsSinceEpoch,
         );
