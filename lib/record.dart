@@ -58,6 +58,7 @@ class RecordPageState extends State<RecordPage> {
 
             return Dismissible(
               child: ListTile(
+                leading: _leadingIcon(index),
                 title: _recordText(index),
                 onTap: () {
                   _updateRecord(index);
@@ -160,7 +161,18 @@ class RecordPageState extends State<RecordPage> {
     }
   }
 
-  Text _recordText(int index) {
+  Widget _leadingIcon(int index) {
+    final status = _records[index].status;
+    var color = Colors.blue;
+    if (status == 0) {
+      color = Colors.grey;
+    } else if (status == 2) {
+      color = Colors.red;
+    }
+    return Icon(Icons.check, color: color,);
+  }
+
+  Widget _recordText(int index) {
     DateTime time = DateTime.fromMillisecondsSinceEpoch(_records[index].recordTime);
     DateFormat format = DateFormat('yyyy-MM-dd');
     return Text(
